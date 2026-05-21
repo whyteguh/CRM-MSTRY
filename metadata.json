@@ -1,0 +1,6 @@
+{
+  "name": "CRM Workshop Portal",
+  "description": "A password-protected hub for CRM workshop attendees featuring resources, hands-on tools, and support ticketing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
