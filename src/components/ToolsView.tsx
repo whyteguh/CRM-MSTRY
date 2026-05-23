@@ -43,6 +43,7 @@ import {
 import { PipelineDeal } from '../types';
 import BainElementsTool from './BainElementsTool';
 import CrmJourneyBuilderTool from './CrmJourneyBuilderTool';
+import CrmSchemaDesignerTool from './CrmSchemaDesignerTool';
 
 interface ToolsViewProps {
   onCalculateRun: () => void;
@@ -50,7 +51,7 @@ interface ToolsViewProps {
 
 export default function ToolsView({ onCalculateRun }: ToolsViewProps) {
   // State for selected tool (null means showing the Grid Catalog)
-  const [selectedToolId, setSelectedToolId] = useState<'bainElements' | 'journeyBuilder' | 'pipeline' | 'clv' | 'leadScore' | 'dbReactivation' | 'hunterFarmer' | 'personaBuilder' | null>(null);
+  const [selectedToolId, setSelectedToolId] = useState<'bainElements' | 'journeyBuilder' | 'schemaDesigner' | 'pipeline' | 'clv' | 'leadScore' | 'dbReactivation' | 'hunterFarmer' | 'personaBuilder' | null>(null);
 
   // Trigger calculation tracker in parental workshop progress
   const notifyCalculation = () => {
@@ -704,6 +705,41 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
                 </div>
               </button>
 
+              {/* Card 3: CRM Schema & RFM Designer */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedToolId('schemaDesigner');
+                  notifyCalculation();
+                }}
+                className="group p-6 rounded-2xl border border-slate-200 bg-white text-left transition-all hover:border-indigo-500 hover:shadow-md cursor-pointer flex flex-col justify-between relative overflow-hidden"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                      <Database className="h-5 w-5" />
+                    </div>
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded border bg-indigo-50 text-indigo-800 border-indigo-100">
+                      Schema Designer
+                    </span>
+                  </div>
+
+                  <h3 className="font-display font-extrabold text-slate-900 text-base group-hover:text-indigo-600 transition-colors">
+                    CRM Schema & RFM Designer
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed hover:text-slate-600 transition-colors">
+                    Rancang kolom database kustom, kustomisasikan logika skor parameter RFM, dan unduh template Sheet berselimut relasi rumus otomatis.
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono">
+                  <span className="text-slate-400">Excel / Google Sheets Formulator</span>
+                  <span className="text-indigo-600 font-bold flex items-center gap-0.5">
+                    Buka Workspace <ChevronRight className="h-3 w-3" />
+                  </span>
+                </div>
+              </button>
+
               {/* Card 4: Database Reactivation ROI Calculator */}
               <button
                 type="button"
@@ -909,6 +945,7 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
                 <h2 className="font-display text-xl font-black text-slate-900 mt-0.5">
                   {selectedToolId === 'bainElements' && "Bain 30 Elements of Value CRM Brainstormer"}
                   {selectedToolId === 'journeyBuilder' && "CRM Journey Builder"}
+                  {selectedToolId === 'schemaDesigner' && "CRM Schema & RFM Designer"}
                   {selectedToolId === 'pipeline' && "Pipeline Forecast Model"}
                   {selectedToolId === 'clv' && "Customer Lifetime Value Simulator"}
                   {selectedToolId === 'leadScore' && "BANT Lead Scoring Matrix"}
@@ -939,6 +976,13 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
              ---------------------------------------------------- */}
           {selectedToolId === 'journeyBuilder' && (
             <CrmJourneyBuilderTool onCalculateRun={notifyCalculation} />
+          )}
+
+          {/* ----------------------------------------------------
+              WORK AREA FOR CRM SCHEMA & RFM DESIGNER TOOL
+             ---------------------------------------------------- */}
+          {selectedToolId === 'schemaDesigner' && (
+            <CrmSchemaDesignerTool onCalculateRun={notifyCalculation} />
           )}
 
           {/* ----------------------------------------------------

@@ -43,56 +43,44 @@ interface KeyResult {
   initiatives: Initiative[];
 }
 
-const DEFAULT_OBJECTIVE = "Membangun Fondasi CRM Unggul untuk Memaksimalkan Siklus Penjualan & Loyalitas Pelanggan Berkelanjutan";
+const DEFAULT_OBJECTIVE = "I have Objective to ....";
 
 const DEFAULT_KEY_RESULTS: KeyResult[] = [
   {
     id: "kr-1",
-    title: "Siklus Pipeline Efisien",
-    targetValue: "Siklus Konversi Rerata Menjadi 18 Hari",
+    title: "i measure with ..",
+    targetValue: "i measure with ..",
     toolTab: "tools",
-    toolHint: "Gunakan 'Model Perkiraan Pipeline' di menu Tools untuk menyelaraskan probabilitas penutupan transaksi secara real-time.",
-    initiatives: [
-      { id: "init-1-1", text: "Memetakan matriks alur kualifikasi (BANT) & penetapan penugasan otomatis untuk prospek baru.", done: false },
-      { id: "init-1-2", text: "Mengonfigurasi kriteria keluar (Exit Criteria) yang ketat pada setiap tahap pipeline penjualan.", done: false },
-      { id: "init-1-3", text: "Menguji webhook otomatis untuk sinkronisasi nilai kontrak kotor dengan sistem pemodalan.", done: false }
-    ]
+    toolHint: "",
+    initiatives: []
   },
   {
     id: "kr-2",
-    title: "Akurasi Kualifikasi Prospek",
-    targetValue: "Skor Kualifikasi BANT Mencapai Akurasi 85%",
+    title: "i measure with ..",
+    targetValue: "i measure with ..",
     toolTab: "tools",
-    toolHint: "Gunakan 'Kualifikasi Prospek BANT' di menu Tools untuk mengukur akurasi prioritas prospek berdasarkan skor otomatis.",
-    initiatives: [
-      { id: "init-2-1", text: "Memicu otomatisasi urutan pengasuhan (nurturing) bagi prospek berkategori hangat.", done: false },
-      { id: "init-2-2", text: "Melakukan audit dan penyesuaian parameter skor prioritas tinggi sesuai tingkat dampak kendala.", done: false },
-      { id: "init-2-3", text: "Membuat alur otomatisasi rute prospek instan ke representasi penjualan spesifik (SLA < 15 menit).", done: false }
-    ]
+    toolHint: "",
+    initiatives: []
   },
   {
     id: "kr-3",
-    title: "Optimasi Nilai LTV Pelanggan",
-    targetValue: "Menjaga Rasio Masa Hidup (LTV) terhadap CAC >= 3:1",
+    title: "i measure with ..",
+    targetValue: "i measure with ..",
     toolTab: "tools",
-    toolHint: "Gunakan 'Simulator Nilai LTV Pelanggan' di menu Tools untuk mensimulasikan rasio loyalitas yang menguntungkan.",
-    initiatives: [
-      { id: "init-3-1", text: "Merancang simulasi LTV interaktif menggunakan koefisien margin produk neto.", done: false },
-      { id: "init-3-2", text: "Menetapkan batas maksimal Biaya Akuisisi Pelanggan (CAC Ceiling) guna menekan denda margin kerugian.", done: false },
-      { id: "init-3-3", text: "Melakukan analisis segmentasi tahunan berbasis kohort untuk menganalisis retensi pelanggan.", done: false }
-    ]
+    toolHint: "",
+    initiatives: []
   }
 ];
 
 export default function DashboardView({ userEmail, onNavigateTab, completedTasks }: DashboardViewProps) {
   // Persistence using local state + localStorage
   const [objective, setObjective] = useState<string>(() => {
-    const saved = localStorage.getItem('crm_okr_objective_v2');
+    const saved = localStorage.getItem('crm_okr_objective_v3');
     return saved !== null ? saved : DEFAULT_OBJECTIVE;
   });
 
   const [keyResults, setKeyResults] = useState<KeyResult[]>(() => {
-    const saved = localStorage.getItem('crm_okr_key_results_v2');
+    const saved = localStorage.getItem('crm_okr_key_results_v3');
     if (saved !== null) {
       try {
         return JSON.parse(saved);
@@ -116,11 +104,11 @@ export default function DashboardView({ userEmail, onNavigateTab, completedTasks
 
   // Sync to local storage
   useEffect(() => {
-    localStorage.setItem('crm_okr_objective_v2', objective);
+    localStorage.setItem('crm_okr_objective_v3', objective);
   }, [objective]);
 
   useEffect(() => {
-    localStorage.setItem('crm_okr_key_results_v2', JSON.stringify(keyResults));
+    localStorage.setItem('crm_okr_key_results_v3', JSON.stringify(keyResults));
   }, [keyResults]);
 
   // Handle ticking initiative checkbox
@@ -375,7 +363,6 @@ export default function DashboardView({ userEmail, onNavigateTab, completedTasks
                     setIsEditingObjective(true);
                   }}
                   className="text-slate-400 hover:text-cyan-400 shrink-0 p-1.5 hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
-                  title="Edit Sasaran Utama"
                 >
                   <Edit3 className="h-4.5 w-4.5" />
                 </button>
@@ -446,7 +433,6 @@ export default function DashboardView({ userEmail, onNavigateTab, completedTasks
                       <button
                         onClick={() => handleStartEditKR(kr)}
                         className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer p-1"
-                        title="Edit Target KR"
                       >
                         <Edit3 className="h-3.5 w-3.5" />
                       </button>
@@ -549,7 +535,6 @@ export default function DashboardView({ userEmail, onNavigateTab, completedTasks
                           <button
                             onClick={() => handleDeleteInitiative(kr.id, init.id)}
                             className="opacity-0 group-hover/init:opacity-100 text-slate-400 hover:text-rose-500 transition-opacity p-1 cursor-pointer shrink-0"
-                            title="Hapus inisiatif"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -587,30 +572,10 @@ export default function DashboardView({ userEmail, onNavigateTab, completedTasks
                       type="button"
                       onClick={() => handleAddInitiative(kr.id)}
                       className="p-1.5 bg-slate-900 border border-slate-900 hover:bg-slate-800 text-white rounded-lg shadow-sm transition-all flex items-center justify-center shrink-0 cursor-pointer"
-                      title="Tambah inisiatif"
                     >
                       <Plus className="h-4 w-4" />
                     </button>
                   </form>
-
-                  {/* Quick-link Associated Tools helper */}
-                  <div className="pt-4 border-t border-slate-100">
-                    <button
-                      onClick={() => onNavigateTab(kr.toolTab)}
-                      className="w-full text-left bg-slate-50 hover:bg-slate-100 px-3 py-2.5 rounded-xl border border-slate-150 flex items-start gap-2 group transition-colors cursor-pointer text-xs"
-                    >
-                      <Lightbulb className="h-4 w-4 text-cyan-600 shrink-0 mt-0.5 group-hover:text-cyan-700 transition-colors" />
-                      <div>
-                        <div className="font-bold text-slate-800 text-[11px] flex items-center gap-1 group-hover:text-cyan-950">
-                          <span>Uji dengan Tools Pendukung</span>
-                          <ChevronRight className="h-3 w-3 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-                        </div>
-                        <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
-                          {kr.toolHint}
-                        </p>
-                      </div>
-                    </button>
-                  </div>
                 </div>
               </div>
             );
