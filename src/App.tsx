@@ -4,13 +4,12 @@ import Sidebar from './components/Sidebar';
 import DashboardView from './components/DashboardView';
 import ResourcesView from './components/ResourcesView';
 import ToolsView from './components/ToolsView';
-import CommunityView from './components/CommunityView';
 
 export default function App() {
-  const USER_EMAIL = 'incentric.id@gmail.com';
+  const USER_EMAIL = 'CRM Master';
 
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
-  const [currentTab, setCurrentTab] = useState<'dashboard' | 'resources' | 'tools' | 'community'>('dashboard');
+  const [currentTab, setCurrentTab] = useState<'dashboard' | 'resources' | 'tools'>('dashboard');
 
   // Completed class progress tasks tracker state variables
   const [completedTasks, setCompletedTasks] = useState({
@@ -123,10 +122,6 @@ export default function App() {
 
           {currentTab === 'tools' && (
             <ToolsView onCalculateRun={handleRunCalculation} />
-          )}
-
-          {currentTab === 'community' && (
-            <CommunityView userEmail={USER_EMAIL} />
           )}
         </div>
 

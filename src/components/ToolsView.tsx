@@ -4,6 +4,7 @@ import {
   ArrowRight,
   TrendingUp, 
   Layers, 
+  GitFork,
   Trash2, 
   Plus, 
   AlertTriangle, 
@@ -40,6 +41,8 @@ import {
   Lightbulb
 } from 'lucide-react';
 import { PipelineDeal } from '../types';
+import BainElementsTool from './BainElementsTool';
+import CrmJourneyBuilderTool from './CrmJourneyBuilderTool';
 
 interface ToolsViewProps {
   onCalculateRun: () => void;
@@ -47,7 +50,7 @@ interface ToolsViewProps {
 
 export default function ToolsView({ onCalculateRun }: ToolsViewProps) {
   // State for selected tool (null means showing the Grid Catalog)
-  const [selectedToolId, setSelectedToolId] = useState<'pipeline' | 'clv' | 'leadScore' | 'dbReactivation' | 'hunterFarmer' | 'personaBuilder' | null>(null);
+  const [selectedToolId, setSelectedToolId] = useState<'bainElements' | 'journeyBuilder' | 'pipeline' | 'clv' | 'leadScore' | 'dbReactivation' | 'hunterFarmer' | 'personaBuilder' | null>(null);
 
   // Trigger calculation tracker in parental workshop progress
   const notifyCalculation = () => {
@@ -631,107 +634,72 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               
-              {/* Card 1: Pipeline Forecast Model */}
+              {/* Card 1: Bain 30 Elements CRM Brainstormer */}
               <button
                 type="button"
                 onClick={() => {
-                  setSelectedToolId('pipeline');
+                  setSelectedToolId('bainElements');
                   notifyCalculation();
                 }}
-                className="group p-6 rounded-2xl border border-slate-200 bg-white text-left transition-all hover:border-cyan-500 hover:shadow-md cursor-pointer flex flex-col justify-between relative overflow-hidden"
+                className="group p-6 rounded-2xl border border-slate-200 bg-white text-left transition-all hover:border-indigo-500 hover:shadow-md cursor-pointer flex flex-col justify-between relative overflow-hidden"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 bg-cyan-50 text-cyan-600 rounded-xl group-hover:bg-cyan-500 group-hover:text-white transition-colors">
+                     <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-500 group-hover:text-white transition-colors">
                       <Layers className="h-5 w-5" />
                     </div>
-                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded border bg-cyan-50 text-cyan-800 border-cyan-100">
-                      Pipeline Weighting
-                    </span>
-                  </div>
-
-                  <h3 className="font-display font-extrabold text-slate-900 text-base group-hover:text-cyan-600 transition-colors">
-                    Pipeline Forecast Model
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                    A weighted revenue calculator adjusting potential accounts by opportunity stage probability indexes to output a corporate projection.
-                  </p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-slate-400">{deals.length} Opportunities</span>
-                  <span className="text-cyan-600 font-bold flex items-center gap-0.5">
-                    Open Suite <ChevronRight className="h-3 w-3" />
-                  </span>
-                </div>
-              </button>
-
-              {/* Card 2: LTV Simulator */}
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedToolId('clv');
-                  notifyCalculation();
-                }}
-                className="group p-6 rounded-2xl border border-slate-200 bg-white text-left transition-all hover:border-cyan-500 hover:shadow-md cursor-pointer flex flex-col justify-between relative overflow-hidden"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                      <TrendingUp className="h-5 w-5" />
-                    </div>
-                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded border bg-emerald-50 text-emerald-800 border-emerald-100">
-                      Lifetime Value
-                    </span>
-                  </div>
-
-                  <h3 className="font-display font-extrabold text-slate-900 text-base group-hover:text-emerald-600 transition-colors">
-                    Customer Lifetime Value
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                    Analyze account lifecycle valuations relative to annual contract frequency and margins to instantly compute target acquisition thresholds.
-                  </p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-slate-400">Net LTV: {formatRp(marginCLV)}</span>
-                  <span className="text-emerald-600 font-bold flex items-center gap-0.5">
-                    Open Suite <ChevronRight className="h-3 w-3" />
-                  </span>
-                </div>
-              </button>
-
-              {/* Card 3: BANT Matrix */}
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedToolId('leadScore');
-                  notifyCalculation();
-                }}
-                className="group p-6 rounded-2xl border border-slate-200 bg-white text-left transition-all hover:border-cyan-500 hover:shadow-md cursor-pointer flex flex-col justify-between relative overflow-hidden"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-500 group-hover:text-white transition-colors">
-                      <Gauge className="h-5 w-5" />
-                    </div>
-                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded border bg-indigo-50 text-indigo-800 border-indigo-105">
-                      Lead Qualification
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded border bg-indigo-50 text-indigo-800 border-indigo-100">
+                      Value Matrix
                     </span>
                   </div>
 
                   <h3 className="font-display font-extrabold text-slate-900 text-base group-hover:text-indigo-600 transition-colors">
-                    BANT Scoring Matrix
+                    Bain 30 Elements CRM Board
                   </h3>
-                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                    Evaluate inbound prospects mathematically using strategic score distributions across Budget, Authority, Need, and Timeline coordinates.
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed animate-fadeIn">
+                    Peta interaktif 30 elemen nilai (Bain & Company) yang dirancang untuk analisis loyalitas, program benefit pelanggan, dan optimalisasi retensi CRM.
                   </p>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-slate-400">Index Score: {totalLeadScore}/100</span>
+                  <span className="text-slate-400">Interactive workspace</span>
                   <span className="text-indigo-600 font-bold flex items-center gap-0.5">
-                    Open Suite <ChevronRight className="h-3 w-3" />
+                    Buka Workspace <ChevronRight className="h-3 w-3" />
+                  </span>
+                </div>
+              </button>
+
+              {/* Card 2: CRM Customer Journey Builder */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedToolId('journeyBuilder');
+                  notifyCalculation();
+                }}
+                className="group p-6 rounded-2xl border border-slate-200 bg-white text-left transition-all hover:border-indigo-500 hover:shadow-md cursor-pointer flex flex-col justify-between relative overflow-hidden"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                      <GitFork className="h-5 w-5" />
+                    </div>
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded border bg-indigo-50 text-indigo-800 border-indigo-100">
+                      Customer Flow
+                    </span>
+                  </div>
+
+                  <h3 className="font-display font-extrabold text-slate-900 text-base group-hover:text-indigo-600 transition-colors">
+                    CRM Journey Builder
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed hover:text-slate-600 transition-colors">
+                    Visualisasikan alur pemicu, keputusan, tindakan, dan jeda pengiriman pesan berbasis interaksi pelanggan secara modular dan dinamis.
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono">
+                  <span className="text-slate-400">Drag & Drop Interactive Flow</span>
+                  <span className="text-indigo-600 font-bold flex items-center gap-0.5">
+                    Buka Workspace <ChevronRight className="h-3 w-3" />
                   </span>
                 </div>
               </button>
@@ -939,6 +907,8 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
                   </span>
                 </div>
                 <h2 className="font-display text-xl font-black text-slate-900 mt-0.5">
+                  {selectedToolId === 'bainElements' && "Bain 30 Elements of Value CRM Brainstormer"}
+                  {selectedToolId === 'journeyBuilder' && "CRM Journey Builder"}
                   {selectedToolId === 'pipeline' && "Pipeline Forecast Model"}
                   {selectedToolId === 'clv' && "Customer Lifetime Value Simulator"}
                   {selectedToolId === 'leadScore' && "BANT Lead Scoring Matrix"}
@@ -956,6 +926,20 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
               Back to Catalog Directory Directory
             </button>
           </div>
+
+          {/* ----------------------------------------------------
+              WORK AREA FOR BAIN ELEMENTS TOOL
+             ---------------------------------------------------- */}
+          {selectedToolId === 'bainElements' && (
+            <BainElementsTool onCalculateRun={notifyCalculation} />
+          )}
+
+          {/* ----------------------------------------------------
+              WORK AREA FOR CRM JOURNEY BUILDER TOOL
+             ---------------------------------------------------- */}
+          {selectedToolId === 'journeyBuilder' && (
+            <CrmJourneyBuilderTool onCalculateRun={notifyCalculation} />
+          )}
 
           {/* ----------------------------------------------------
               WORK AREA FOR PIPELINE TOOL

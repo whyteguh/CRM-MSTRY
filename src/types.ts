@@ -25,6 +25,7 @@ export interface ResourceItem {
   description: string;
   fileSize: string;
   downloadsCount: number;
+  downloadUrl?: string;
 }
 
 export interface SupportTicket {

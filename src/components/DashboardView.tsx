@@ -19,7 +19,7 @@ import {
 
 interface DashboardViewProps {
   userEmail: string;
-  onNavigateTab: (tab: 'dashboard' | 'resources' | 'tools' | 'community') => void;
+  onNavigateTab: (tab: 'dashboard' | 'resources' | 'tools') => void;
   completedTasks: {
     unlockedHub: boolean;
     resourcesViewed: boolean;
@@ -38,7 +38,7 @@ interface KeyResult {
   id: string;
   title: string;
   targetValue: string;
-  toolTab: 'tools' | 'resources' | 'community';
+  toolTab: 'tools' | 'resources';
   toolHint: string;
   initiatives: Initiative[];
 }
