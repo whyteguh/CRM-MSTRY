@@ -610,75 +610,166 @@ export default function CrmSchemaDesignerTool({ onCalculateRun }: CrmSchemaDesig
                   </p>
                 </div>
               ) : (
-                <table className="min-w-full divide-y divide-slate-150 leading-none">
-                  <thead className="bg-slate-50/50">
-                    <tr className="border-b border-slate-150">
-                      <th scope="col" className="px-5 py-3.5 text-left text-[10px] font-mono font-bold text-slate-450 text-slate-400 uppercase tracking-widest">
-                        Kolom Header Google Sheets
+                <table className="w-full text-left border-collapse table-fixed select-text whitespace-nowrap">
+                  <thead>
+                    <tr className="bg-slate-100 border-b border-slate-300">
+                      {/* Left space for row number */}
+                      <th className="w-12 bg-slate-150 border-r border-b border-slate-300 text-center font-mono text-[10px] font-bold text-slate-500 py-3 select-none">
+                        
                       </th>
-                      <th scope="col" className="px-5 py-3.5 text-left text-[10px] font-mono font-bold text-slate-450 text-slate-400 uppercase tracking-widest">
-                        Kategori Klasifikasi
-                      </th>
-                      <th scope="col" className="px-5 py-3.5 text-left text-[10px] font-mono font-bold text-slate-450 text-slate-400 uppercase tracking-widest">
-                        Tipe Masukan
-                      </th>
-                      <th scope="col" className="px-5 py-3.5 text-left text-[10px] font-mono font-bold text-slate-450 text-slate-400 uppercase tracking-widest">
-                        ID Atribut Database
-                      </th>
-                      <th scope="col" className="px-5 py-3.5 text-right text-[10px] font-mono font-bold text-slate-450 text-slate-400 uppercase tracking-widest">
-                        Tindakan
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-slate-100">
-                    {schema.map((field) => {
-                      const color = CATEGORY_COLORS[field.category] || CATEGORY_COLORS.Custom;
-                      const isFormula = field.type === 'formula';
-                      return (
-                        <tr key={field.id} className="hover:bg-slate-50/40 transition-colors group">
-                          
-                          {/* Name Parameter */}
-                          <td className="px-5 py-4 whitespace-nowrap text-xs font-bold text-slate-800">
-                            {field.name}
-                          </td>
-
-                          {/* Category Badge */}
-                          <td className="px-5 py-4 whitespace-nowrap text-xs">
-                            <span className={`px-2 py-1 inline-flex text-[10px] font-extrabold tracking-wide rounded-full border ${color.bg} ${color.text} ${color.border}`}>
-                              {field.category}
-                            </span>
-                          </td>
-
-                          {/* Data Type Badge */}
-                          <td className="px-5 py-4 whitespace-nowrap text-xs">
-                            <span className={`px-2 py-0.5 inline-flex items-center gap-1 text-[10px] font-mono font-bold rounded-md border text-slate-600 bg-slate-100 border-slate-200/60 ${
-                              isFormula ? 'bg-indigo-50 border-indigo-150 text-indigo-700' : ''
-                            }`}>
-                              {isFormula && <FileCode className="h-3 w-3 text-indigo-550" />}
-                              {field.type}
-                            </span>
-                          </td>
-
-                          {/* Database ID internal */}
-                          <td className="px-5 py-4 whitespace-nowrap text-[10px] font-mono text-slate-400">
-                            {field.id}
-                          </td>
-
-                          {/* Individual deletions trigger */}
-                          <td className="px-5 py-4 whitespace-nowrap text-right text-xs">
-                            <button
+                      {schema.map((field, index) => (
+                        <th 
+                          key={field.id} 
+                          className="px-4 py-3 border-r border-b border-slate-300 relative group min-w-[200px] max-w-[250px] bg-slate-100/90 hover:bg-slate-200/80 transition-colors select-none"
+                        >
+                          <div className="flex justify-between items-center gap-2">
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-[10px] font-mono leading-none font-bold text-slate-450">
+                                {getColLetter(index)}
+                              </span>
+                              <span className="text-xs font-bold text-slate-800 truncate mt-1.5" title={field.name}>
+                                {field.name}
+                              </span>
+                            </div>
+                            <button 
                               type="button"
                               onClick={() => handleRemoveField(field.id, field.name)}
-                              className="p-1 px-1.5 rounded-lg border border-slate-100 hover:border-red-200 text-slate-400 hover:text-red-500 bg-white shadow-xs opacity-0 group-hover:opacity-100 transition-all duration-150 cursor-pointer"
+                              className="text-slate-400 hover:text-rose-600 hover:bg-rose-50 p-1 rounded transition-all cursor-pointer opacity-0 group-hover:opacity-100 shrink-0"
                               title={`Hapus kolom ${field.name}`}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {/* Row 1: Meta/Types (Row label "1") */}
+                    <tr className="hover:bg-slate-50/45 transition-colors">
+                      <td className="w-12 bg-slate-100 border-r border-slate-250 text-center font-mono text-[10px] font-bold text-slate-400 py-3.5 select-none">
+                        1
+                      </td>
+                      {schema.map((field) => {
+                        const color = CATEGORY_COLORS[field.category] || CATEGORY_COLORS.Custom;
+                        const isFormula = field.type === 'formula';
+                        return (
+                          <td key={field.id} className="px-4 py-3 border-r border-slate-200 bg-slate-50/40 min-w-[200px]">
+                            <div className="flex flex-col gap-1.5">
+                              <span className={`px-2 py-0.5 inline-flex text-[9px] font-extrabold tracking-wide rounded border ${color.bg} ${color.text} ${color.border} w-fit`}>
+                                {field.category}
+                              </span>
+                              <span className="text-[10px] text-slate-500 font-mono flex items-center gap-1">
+                                {isFormula ? (
+                                  <>
+                                    <FileCode className="h-3.5 w-3.5 text-indigo-500" />
+                                    Formula
+                                  </>
+                                ) : (
+                                  field.type
+                                )}
+                              </span>
+                            </div>
                           </td>
+                        );
+                      })}
+                    </tr>
 
-                        </tr>
-                      );
-                    })}
+                    {/* Row 2: Formula / Interactive preview (Row label "2") */}
+                    <tr className="hover:bg-slate-50/45 transition-colors">
+                      <td className="w-12 bg-slate-100 border-r border-slate-250 text-center font-mono text-[10px] font-bold text-slate-400 py-3 select-none">
+                        2
+                      </td>
+                      {schema.map((field) => {
+                        let cellContent = (
+                          <span className="text-slate-300 italic text-[11px] font-mono">
+                            [Masukkan Data...]
+                          </span>
+                        );
+                        
+                        if (field.id === 'rfm_score_r') {
+                          const rawIdx = schema.findIndex(f => f.id === 'rfm_raw_r');
+                          const formStr = rawIdx !== -1 
+                            ? generateSpreadsheetFormula(rfmConfig.recency, `${getColLetter(rawIdx)}2`) 
+                            : 'Missing Raw Recency';
+                          cellContent = (
+                            <div 
+                              className="text-indigo-700 font-mono text-[10px] bg-indigo-50 border border-indigo-100 px-2 py-1 rounded w-full select-all font-semibold break-all leading-normal text-left"
+                              title={formStr}
+                            >
+                              {formStr}
+                            </div>
+                          );
+                        } else if (field.id === 'rfm_score_f') {
+                          const rawIdx = schema.findIndex(f => f.id === 'rfm_raw_f');
+                          const formStr = rawIdx !== -1 
+                            ? generateSpreadsheetFormula(rfmConfig.frequency, `${getColLetter(rawIdx)}2`) 
+                            : 'Missing Raw Frequency';
+                          cellContent = (
+                            <div 
+                              className="text-indigo-700 font-mono text-[10px] bg-indigo-50 border border-indigo-100 px-2 py-1 rounded w-full select-all font-semibold break-all leading-normal text-left"
+                              title={formStr}
+                            >
+                              {formStr}
+                            </div>
+                          );
+                        } else if (field.id === 'rfm_score_m') {
+                          const rawIdx = schema.findIndex(f => f.id === 'rfm_raw_m');
+                          const formStr = rawIdx !== -1 
+                            ? generateSpreadsheetFormula(rfmConfig.monetary, `${getColLetter(rawIdx)}2`) 
+                            : 'Missing Raw Monetary';
+                          cellContent = (
+                            <div 
+                              className="text-indigo-700 font-mono text-[10px] bg-indigo-50 border border-indigo-100 px-2 py-1 rounded w-full select-all font-semibold break-all leading-normal text-left"
+                              title={formStr}
+                            >
+                              {formStr}
+                            </div>
+                          );
+                        } else if (field.id === 'rfm_segment') {
+                          const rIdx = schema.findIndex(f => f.id === 'rfm_score_r');
+                          const fIdx = schema.findIndex(f => f.id === 'rfm_score_f');
+                          const mIdx = schema.findIndex(f => f.id === 'rfm_score_m');
+                          const formStr = (rIdx !== -1 && fIdx !== -1 && mIdx !== -1)
+                            ? `=CONCATENATE(${getColLetter(rIdx)}2, ${getColLetter(fIdx)}2, ${getColLetter(mIdx)}2)`
+                            : 'Missing Scores';
+                          cellContent = (
+                            <div 
+                              className="text-indigo-700 font-mono text-[10px] bg-indigo-50 border border-indigo-100 px-2 py-1 rounded w-full select-all font-semibold break-all leading-normal text-left"
+                              title={formStr}
+                            >
+                              {formStr}
+                            </div>
+                          );
+                        } else if (field.type === 'formula') {
+                          cellContent = (
+                            <div className="text-slate-600 font-mono text-[10px] bg-slate-50 border border-slate-200 px-2 py-1 rounded w-full text-left">
+                              =KustomFormula()
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <td key={field.id} className="px-4 py-3 border-r border-slate-200 min-w-[200px] max-w-[250px]">
+                            {cellContent}
+                          </td>
+                        );
+                      })}
+                    </tr>
+
+                    {/* Empty simulated list: Rows 3 to 7 */}
+                    {[3, 4, 5, 6, 7].map((rowNum) => (
+                      <tr key={rowNum} className="hover:bg-slate-50/20 transition-colors">
+                        <td className="w-12 bg-slate-100 border-r border-slate-250 text-center font-mono text-[10px] font-bold text-slate-400 py-3.5 select-none">
+                          {rowNum}
+                        </td>
+                        {schema.map((field) => (
+                          <td key={field.id} className="px-4 py-3.5 border-r border-slate-100 min-w-[200px]">
+                            <div className="h-3 w-full bg-slate-50/60 rounded-sm border border-dashed border-slate-200/50"></div>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               )}
