@@ -590,6 +590,154 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
     setTimeout(() => setPersonaCopySuccess(false), 2000);
   };
 
+  const [copiedText, setCopiedText] = useState<string | null>(null);
+
+  const alertCopyStatus = (toolName: string) => {
+    setCopiedText(`Strategic ${toolName} prompt copied to clipboard! Paste it into your choice AI platform.`);
+    setTimeout(() => setCopiedText(null), 3000);
+  };
+
+  const copyPipelineAiPrompt = () => {
+    let dealStr = "";
+    deals.forEach(d => {
+      dealStr += `- Deal: **${d.dealName}** | Stage: ${d.stage} | Value: Rp ${d.value.toLocaleString('id-ID')} | Probability: ${d.probability}%\n`;
+    });
+    const prompt = `I am using a CRM Pipeline Strategic Forecast tool. Here is my current sales pipeline:
+
+### Current Deals:
+${dealStr || "No deals configured in the pipeline."}
+
+* Total Pipeline Value: Rp ${totalValue.toLocaleString('id-ID')}
+* Expected Weighted Value: Rp ${expectedValue.toLocaleString('id-ID')}
+
+Act as an expert CRM Sales Director & Sales Enablement Strategist. Review my sales pipeline and help me:
+1. Identify velocity risks and potential bottlenecks in the stages (Qualification, Proposal, Negotiation, Decision).
+2. Recommend 3 concrete tactical actions or follow-up playbook procedures for our high-value deals to increase their win probability.
+3. Design a CRM dashboard sequence layout or telemetry checklist we should build to track the momentum of these active deals.
+4. Suggest a targeted sales training coaching topic for the sales team based on the weighted probabilities of this pipeline.`;
+    navigator.clipboard.writeText(prompt).then(() => {
+      alertCopyStatus("Pipeline Forecast");
+    });
+  };
+
+  const copyClvAiPrompt = () => {
+    const prompt = `I am using an Account Customer Lifetime Value (CLV) Life Cycle Simulator. Here are my current unit economics and customer parameters:
+
+* Average Order Value (AOV) / Average Contract Value: Rp ${purchaseValue.toLocaleString('id-ID')}
+* Annual Purchase Frequency: ${frequency} transactions/year
+* Customer Lifespan: ${lifespan} years
+* Gross Profit Margin: ${margin}%
+* Annual Revenue per Account: Rp ${annualRevenue.toLocaleString('id-ID')}
+* Raw Lifetime Value (LTV): Rp ${rawCLV.toLocaleString('id-ID')}
+* Margin LTV (Gross Margin CLV): Rp ${marginCLV.toLocaleString('id-ID')}
+* Maximum Recommended CAC (1:3 Golden Ratio): Rp ${maxCAC.toLocaleString('id-ID')}
+
+Act as an expert Chief Marketing Officer and Unit Economics Advisor. Review my customer lifetime values and CAC targets, then:
+1. Provide a comprehensive critique of this unit economic formula. Is the max CAC target of Rp ${maxCAC.toLocaleString('id-ID')} realistic or too aggressive for digital acquisition channels?
+2. Propose 3 high-impact customer retention and loyalty programs to increase the Annual Purchase Frequency past ${frequency} times per year.
+3. Suggest 2 cross-sell or up-sell strategies to raise our Average Order Value from Rp ${purchaseValue.toLocaleString('id-ID')} to a higher bracket.
+4. Draft a checklist of onboarding campaigns or milestones (e.g. at Day 30, Day 90) designed to extend the customer lifespan from ${lifespan} years to 5+ years.`;
+    navigator.clipboard.writeText(prompt).then(() => {
+      alertCopyStatus("Customer Lifetime Value");
+    });
+  };
+
+  const copyLeadScoreAiPrompt = () => {
+    const prompt = `I am using a BANT (Budget, Authority, Need, Timeline) Lead Scoring Matrix tool. Here is the BANT configuration of my current prospect:
+
+* Budget Score: ${budgetScore} / 30 pts
+* Authority Score: ${authorityScore} / 30 pts
+* Need Score: ${needScore} / 20 pts
+* Timeline Score: ${timelineScore} / 20 pts
+* Total Lead Score: ${totalLeadScore} / 100 pts
+
+Act as an expert Inside Sales Director and CRM Lead Nurturing Consultant. Review this BANT lead state and:
+1. Provide an objective evaluation of the prospect's priority. What is the sales readiness class (e.g. Hot, Warm, Cold) and follow-up timeline for a lead with a BANT score of ${totalLeadScore}/100?
+2. Create 3 personalized qualifying questions or AE instructions to ask in the next call to unpack the gaps in the lowest scoring categories.
+3. Outline a CRM nurturing cadence flow (email + phone triggers) tailored specifically for this prospect's scores.
+4. Draft a direct, elegant LinkedIn outreach template or email template we can send to build further trust.`;
+    navigator.clipboard.writeText(prompt).then(() => {
+      alertCopyStatus("BANT Lead Score");
+    });
+  };
+
+  const copyHunterFarmerAiPrompt = () => {
+    const hunterPct = 100 - percentageFarmer;
+    const farmerPct = percentageFarmer;
+    const prompt = `I am using a CRM Hunter vs. Farmer Assessment Matrix to align my sales team roles. Here is the alignment breakdown for my assessment:
+
+* Farmer Alignment Index: ${farmerPct}%
+* Hunter Alignment Index: ${hunterPct}%
+* Classification: ${farmerPct > 53 ? 'Farmer Heavy (Account Development & Care focus)' : hunterPct > 53 ? 'Hunter Heavy (Net-New Acquisition focus)' : 'Hybrid Balanced'}
+
+Act as an expert Sales Force Architect and CRM Sales Consultant. Analyze this alignment profile and help me:
+1. Define the ideal job description, daily workflow, and monthly goals for a salesperson with this ${farmerPct}% Farmer vs ${hunterPct}% Hunter profile.
+2. Outline the exact CRM layout changes, pipeline boards, and automated reminders we must configure to empower this persona.
+3. Propose a balanced commission and bonus compensation model that matches their natural strengths.
+4. Suggest weekly progress coaching questions the sales manager can ask to keep them highly motivated.`;
+    navigator.clipboard.writeText(prompt).then(() => {
+      alertCopyStatus("Hunter vs. Farmer Assessment");
+    });
+  };
+
+  const copyDbReactivationAiPrompt = () => {
+    const prompt = `I am using a Dormant Database ROI Reactivation Calculator. Here is my current opportunity database:
+
+* Inactive/Dormant Contacts Size: ${inactiveContacts.toLocaleString('id-ID')} entries
+* Average Order Value (AOV): Rp ${dormantAov.toLocaleString('id-ID')}
+* Standard Customer Acquisition Cost (CAC): Rp ${dormantCac.toLocaleString('id-ID')}
+* Targeted Reactivation Conversion Rate: ${dormantConversion}%
+* Potential Recovered Revenue: Rp ${potentialLostRevenue.toLocaleString('id-ID')}
+* Estimated Reactivated Customers count: ${activatedDormantCustomers.toLocaleString('id-ID')} customers
+* Campaign Realization: "${dormantRealityMessage}"
+
+Act as an elite Retention Marketing Manager and CRM Customer Data Platform (CDP) Specialist. Review this reactivation model and:
+1. Propose 3 detailed segment criteria (e.g. Last active 90-180 days, cart abandoners, previous high spenders) to split this inactive list into prioritized cohorts.
+2. Outline a creative, highly personalized reactivation messaging sequence (e.g. Email (Subject + body outline) + Whatsapp trigger sequence) that feels helpful and non-spammy.
+3. Suggest a reactivation incentive strategy (discount vs free gift vs exclusive early-access) that maintains profit margins.
+4. Draft the CRM orchestration rules and webhooks we should set up to automatically trigger this campaign if a customer is inactive for too long.`;
+    navigator.clipboard.writeText(prompt).then(() => {
+      alertCopyStatus("Database Reactivation");
+    });
+  };
+
+  const copyPersonaBuilderAiPrompt = () => {
+    const prompt = `I have designed an Ideal Customer Profile (ICP) & Persona in my CRM system. Here are the core specifications of the business and the target buyer persona:
+
+### Business Context:
+* Business/Product Name: "${personaData.businessName}"
+* Description: "${personaData.businessDescription}"
+
+### Buyer Persona Identity:
+* Persona Name: "${personaData.customerName}"
+* Title: "${personaData.finances.jobTitle}" at "${personaData.finances.company}"
+* Monthly Income bracket: ${personaData.finances.income}
+* Demographics: Age: ${personaData.demographics.age} | Marital: ${personaData.demographics.maritalStatus} | Location: ${personaData.demographics.location}
+* Financial Details: Primary Skill: ${personaData.finances.skill}
+
+### Daily Life & Habits:
+* Morning: ${personaData.dailyLife.morning}
+* Afternoon: ${personaData.dailyLife.afternoon}
+* Night: ${personaData.dailyLife.night}
+
+### Primary Motives:
+* Hopes & Dreams:
+${personaData.hopesDreams.map(h => `- ${h}`).join('\n')}
+* Worries & Fears:
+${personaData.worriesFears.map(w => `- ${w}`).join('\n')}
+* Brand Affinities: ${personaData.brandAffinities.join(', ')}
+
+Act as an expert Product Marketing Director and senior CRM Strategy advisor. Analyze this persona profile and:
+1. Formulate 3 distinct lead-generation campaign concepts tailored specifically to attract ${personaData.customerName} based on their hopes/fears.
+2. Outline a 3-part CRM email sequence to build trust with this buyer. Include recommendations for high-impact Subject Lines that target their core worry of: "${personaData.worriesFears[0]}".
+3. Propose the optimal CRM lifecycle stages (eg. Subscriber -> SQL -> AE Demo -> Champion) and touchpoint channels (LinkedIn, WhatsApp, Email, Call) to engage them throughout their decision journey.
+4. Draft a custom 150-word elevator pitch speaking directly to this buyer that addresses their daily routines.`;
+
+    navigator.clipboard.writeText(prompt).then(() => {
+      alertCopyStatus("ICP & Persona Builder");
+    });
+  };
+
   const currentProfileResult = getHunterFarmerProfile(percentageHunter);
 
   const formatRp = (num: number) => {
@@ -993,8 +1141,17 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
               {/* Opportunities workspace list */}
               <div className="lg:col-span-8 space-y-6">
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6">
-                  <h3 className="font-display font-extrabold text-base text-slate-900 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
+                  <h3 className="font-display font-extrabold text-base text-slate-900 mb-6 flex items-center justify-between gap-2 border-b border-slate-100 pb-4">
                     <span>Opportunity Pipeline Management Workspace</span>
+                    <button
+                      type="button"
+                      onClick={copyPipelineAiPrompt}
+                      className="flex items-center gap-1 px-3 py-1 bg-amber-500 hover:bg-amber-400 text-white leading-none font-bold text-[10px] rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer animate-pulse shrink-0 uppercase tracking-wider"
+                      title="Analyze this pipeline with AI"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" />
+                      Analyze with AI
+                    </button>
                   </h3>
 
                   {/* Add deal inline component */}
@@ -1164,8 +1321,17 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
             <div className="grid lg:grid-cols-12 gap-8">
               {/* Sliders Input Work Area */}
               <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-8">
-                <h3 className="font-display font-extrabold text-base text-slate-900 border-b border-slate-100 pb-4">
-                  Account Lifecycle Simulator Inputs
+                <h3 className="font-display font-extrabold text-base text-slate-900 border-b border-slate-100 pb-4 flex items-center justify-between gap-2">
+                  <span>Account Lifecycle Simulator Inputs</span>
+                  <button
+                    type="button"
+                    onClick={copyClvAiPrompt}
+                    className="flex items-center gap-1 px-3 py-1 bg-amber-500 hover:bg-amber-400 text-white leading-none font-bold text-[10px] rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer animate-pulse shrink-0 uppercase tracking-wider"
+                    title="Analyze customer lifetime value with AI"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Analyze with AI
+                  </button>
                 </h3>
 
                 {/* Slider 1: Average Order value */}
@@ -1300,8 +1466,17 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
             <div className="grid lg:grid-cols-12 gap-8">
               {/* Questionnaire assessment workspace */}
               <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-6">
-                <h3 className="font-display font-bold text-base text-slate-900 border-b border-slate-100 pb-4">
-                  Prospect Standard BANT Scoring Interface
+                <h3 className="font-display font-bold text-base text-slate-900 border-b border-slate-100 pb-4 flex items-center justify-between gap-2">
+                  <span>Prospect Standard BANT Scoring Interface</span>
+                  <button
+                    type="button"
+                    onClick={copyLeadScoreAiPrompt}
+                    className="flex items-center gap-1 px-3 py-1 bg-amber-500 hover:bg-amber-400 text-white leading-none font-bold text-[10px] rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer animate-pulse shrink-0 uppercase tracking-wider"
+                    title="Analyze BANT prospect scorecard with AI"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Analyze with AI
+                  </button>
                 </h3>
 
                 <div className="space-y-6">
@@ -1522,6 +1697,15 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
                         <Crosshair className="h-4 w-4" />
                       </span>
                       Strategic Alignment Quiz
+                      <button
+                        type="button"
+                        onClick={copyHunterFarmerAiPrompt}
+                        className="flex items-center gap-1 px-2 py-0.5 bg-amber-500 hover:bg-amber-400 text-white leading-none font-bold text-[9px] rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer animate-pulse shrink-0 uppercase tracking-widest ml-1"
+                        title="Analyze team alignment with AI"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        Analyze with AI
+                      </button>
                     </h3>
                     <span className="text-xs font-mono font-bold text-slate-400">
                       Question {currentQuizIndex + 1} of 8
@@ -1748,11 +1932,22 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
             <div className="grid lg:grid-cols-12 gap-8 animate-fadeIn">
               {/* Input Section */}
               <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-6">
-                <h3 className="font-display font-extrabold text-base text-slate-900 border-b border-slate-100 pb-4 flex items-center gap-2">
-                  <span className="p-1.5 bg-rose-50 rounded-lg text-rose-600">
-                    <Database className="h-4 w-4" />
+                <h3 className="font-display font-extrabold text-base text-slate-900 border-b border-slate-100 pb-4 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2">
+                    <span className="p-1.5 bg-rose-50 rounded-lg text-rose-600">
+                      <Database className="h-4 w-4" />
+                    </span>
+                    <span>Database Reactivation Inputs</span>
                   </span>
-                  Database Reactivation Inputs
+                  <button
+                    type="button"
+                    onClick={copyDbReactivationAiPrompt}
+                    className="flex items-center gap-1 px-3 py-1 bg-amber-500 hover:bg-amber-400 text-white leading-none font-bold text-[10px] rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer animate-pulse shrink-0 uppercase tracking-wider"
+                    title="Analyze reactivation targets with AI"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Analyze with AI
+                  </button>
                 </h3>
 
                 {/* Dormant / Inactive Database Pool Size */}
@@ -1924,31 +2119,43 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
             <div className="space-y-6 animate-fadeIn">
               
               {/* Profile Workspace Editor/Viewer Toggles */}
-              <div className="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200 w-fit print:hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
+                <div className="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200 w-fit">
+                  <button
+                    type="button"
+                    onClick={() => setPersonaIsEditing(true)}
+                    className={`px-5 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+                      personaIsEditing 
+                        ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-900/5' 
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5" /> Direct Workspace Editor
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPersonaIsEditing(false);
+                      notifyCalculation();
+                    }}
+                    className={`px-5 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+                      !personaIsEditing 
+                        ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-900/5' 
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" /> High-Contrast Document Output
+                  </button>
+                </div>
+
                 <button
                   type="button"
-                  onClick={() => setPersonaIsEditing(true)}
-                  className={`px-5 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
-                    personaIsEditing 
-                      ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-900/5' 
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
+                  onClick={copyPersonaBuilderAiPrompt}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white font-extrabold text-xs rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer animate-pulse tracking-wider self-start sm:self-auto uppercase font-mono"
+                  title="Salin prompt analisis persona ideal dengan AI"
                 >
-                  <Layers className="w-3.5 h-3.5" /> Direct Workspace Editor
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPersonaIsEditing(false);
-                    notifyCalculation();
-                  }}
-                  className={`px-5 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
-                    !personaIsEditing 
-                      ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-900/5' 
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <Sparkles className="w-3.5 h-3.5" /> High-Contrast Document Output
+                  <Sparkles className="h-4 w-4" />
+                  Analyze with AI
                 </button>
               </div>
 
@@ -2881,6 +3088,18 @@ Berikan analisa strategis, elegan, dan *actionable* mengenai:
             </div>
           )}
 
+        </div>
+      )}
+
+      {copiedText && (
+        <div className="fixed bottom-6 right-6 z-[200] bg-white text-slate-800 px-5 py-3.5 rounded-xl border border-slate-200 shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-0 animate-bounce">
+          <div className="p-2 rounded-lg border bg-emerald-50 text-emerald-600 border-emerald-100 flex items-center justify-center">
+            <CheckCircle className="h-4 w-4" />
+          </div>
+          <div>
+            <span className="text-xs font-bold block text-slate-900">AI Prompt Copied!</span>
+            <span className="text-[11px] text-slate-500">{copiedText}</span>
+          </div>
         </div>
       )}
 

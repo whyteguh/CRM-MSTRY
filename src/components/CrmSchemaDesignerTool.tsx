@@ -207,6 +207,49 @@ export default function CrmSchemaDesignerTool({ onCalculateRun }: CrmSchemaDesig
     onCalculateRun();
   };
 
+  const [copied, setCopied] = useState(false);
+
+  const copyAiAnalysisPrompt = () => {
+    let schemaDetails = "";
+    if (schema.length === 0) {
+      schemaDetails = "The custom schema is currently empty.";
+    } else {
+      schema.forEach((field, index) => {
+        schemaDetails += `- Column **${getColLetter(index)}**: "${field.name}" (Type: ${field.type}, Category: ${field.category}, ID: ${field.id})\n`;
+      });
+    }
+
+    let rfmRulesStr = "\n### RFM Category Configuration Rules:\n";
+    rfmRulesStr += "#### Recency (days or less for score):\n";
+    rfmConfig.recency.forEach(rule => {
+      rfmRulesStr += `- Score ${rule.score}: ${rule.operator} ${rule.value} days (${rule.label})\n`;
+    });
+    rfmRulesStr += "#### Frequency (orders or count for score):\n";
+    rfmConfig.frequency.forEach(rule => {
+      rfmRulesStr += `- Score ${rule.score}: ${rule.operator} ${rule.value} times (${rule.label})\n`;
+    });
+    rfmRulesStr += "#### Monetary (lifetime value/spend for score):\n";
+    rfmConfig.monetary.forEach(rule => {
+      rfmRulesStr += `- Score ${rule.score}: ${rule.operator} ${rule.value} spend (${rule.label})\n`;
+    });
+
+    const promptText = `I have designed a custom CRM Database Schema and configured specialized RFM (Recency, Frequency, Monetary) Scoring Rules. Here is my configuration:
+
+### Custom Database Columns:
+${schemaDetails}
+${rfmRulesStr}
+Please act as an elite CRM Database Developer and Customer Analytics Consultant. Analyze this database design and:
+1. Provide a rigorous appraisal of the schema. Are there any critical customer entity attributes missing for general commercial growth operations (B2B/B2C)?
+2. Audit the custom RFM rules I've defined. Are the threshold boundaries commercially balanced, and what strategies should be deployed for the high scorers (Loyalists 555) vs lowest scores (Churn Risks)?
+3. Draft the exact SQL CREATE TABLE queries and indexes corresponding to this custom schema for MySQL or PostgreSQL databases.
+4. Recommend how to query the database to calculate real-time cohort analysis reports based on this dataset.`;
+
+    navigator.clipboard.writeText(promptText).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    });
+  };
+
   const clearSchema = () => {
     if (!window.confirm('Apakah Anda yakin ingin mengosongkan SELURUH rancangan skema? Tindakan ini tidak dapat dibatalkan.')) return;
     setSchema([]);
@@ -569,6 +612,20 @@ export default function CrmSchemaDesignerTool({ onCalculateRun }: CrmSchemaDesig
 
               {/* Action buttons list */}
               <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={copyAiAnalysisPrompt}
+                  className={`flex items-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-bold font-sans transition-all cursor-pointer ${
+                    copied 
+                      ? 'bg-emerald-600 text-white border-emerald-500 hover:bg-emerald-700 animate-none' 
+                      : 'bg-amber-500 hover:bg-amber-400 text-white shadow-xs hover:shadow-md animate-pulse'
+                  }`}
+                  title="Salin prompt analisis AI berdasarkan konfigurasi skema dan aturan RFM saat ini"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span>{copied ? 'Prompt Copied!' : 'Analyze with AI'}</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={handleDownloadDataDictionary}

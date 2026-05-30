@@ -13,8 +13,8 @@ import {
 } from 'lucide-react';
 
 interface SidebarProps {
-  currentTab: 'dashboard' | 'resources' | 'tools';
-  onTabChange: (tab: 'dashboard' | 'resources' | 'tools') => void;
+  currentTab: 'dashboard' | 'resources' | 'tools' | 'consultation';
+  onTabChange: (tab: 'dashboard' | 'resources' | 'tools' | 'consultation') => void;
   onLogout: () => void;
   userEmail: string;
 }
@@ -26,9 +26,10 @@ export default function Sidebar({ currentTab, onTabChange, onLogout, userEmail }
     { id: 'dashboard', label: 'Dashboard Hub', icon: BarChart3, desc: 'Pusat aktivitas kelas' },
     { id: 'resources', label: 'Modul & Handbook', icon: FolderOpen, desc: 'Slides, sheets & panduan materi' },
     { id: 'tools', label: 'Tools Architecting', icon: Wrench, desc: 'Simulasi LTV & arsitektur CRM' },
+    { id: 'consultation', label: 'Consulting Clinic 1-on-1', icon: CalendarCheck, desc: 'Jadwal tatap muka & bimbingan' }
   ] as const;
 
-  const handleTabClick = (tabId: 'dashboard' | 'resources' | 'tools') => {
+  const handleTabClick = (tabId: 'dashboard' | 'resources' | 'tools' | 'consultation') => {
     onTabChange(tabId);
     setIsOpenMobile(false);
   };

@@ -4,12 +4,13 @@ import Sidebar from './components/Sidebar';
 import DashboardView from './components/DashboardView';
 import ResourcesView from './components/ResourcesView';
 import ToolsView from './components/ToolsView';
+import ConsultationView from './components/ConsultationView';
 
 export default function App() {
   const USER_EMAIL = 'CRM Master';
 
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
-  const [currentTab, setCurrentTab] = useState<'dashboard' | 'resources' | 'tools'>('dashboard');
+  const [currentTab, setCurrentTab] = useState<'dashboard' | 'resources' | 'tools' | 'consultation'>('dashboard');
 
   // Completed class progress tasks tracker state variables
   const [completedTasks, setCompletedTasks] = useState({
@@ -122,6 +123,10 @@ export default function App() {
 
           {currentTab === 'tools' && (
             <ToolsView onCalculateRun={handleRunCalculation} />
+          )}
+
+          {currentTab === 'consultation' && (
+            <ConsultationView />
           )}
         </div>
 

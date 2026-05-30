@@ -590,6 +590,36 @@ export default function BainElementsTool({ onCalculateRun }: BainElementsToolPro
     });
   };
 
+  const copyAiAnalysisPrompt = () => {
+    let elementDetails = "";
+    Object.keys(elementsDefinition).forEach(key => {
+      const element = elementsDefinition[key];
+      const campaigns = campaignsData[key] || [];
+      if (campaigns.length > 0) {
+        elementDetails += `- **${element.name}** (${element.category}): ${element.description}\n`;
+        campaigns.forEach(c => {
+          elementDetails += `  * Initiative: ${c.name} (Status: ${c.status === 'live' ? 'Live' : c.status === 'progress' ? 'In Development' : 'Backlog'}, Benefit: ${c.benefit}, Trigger: ${c.trigger}, Channel: ${c.channel})\n`;
+        });
+      }
+    });
+
+    const promptText = `I have completed a Bain 30 Elements of Value CRM Alignment brainstorm. Here is the configuration I designed:
+
+${elementDetails || "No elements or campaigns configured yet."}
+
+Please act as a senior CRM strategist and CRM marketing specialist. Analyze my roadmap and help me:
+1. Provide a detailed strategic analysis and validation of our selected value elements.
+2. Draft 3 persuasive copywriting examples for dynamic CRM emails or push-notification sequences matching the trigger events configured above.
+3. Suggest a phased, highly tactical execution plan (Quick Wins, Medium term, Long term) for these initiatives.
+4. Recommend key performance indicators (KPIs) to measure of our selected high-priority value elements.`;
+
+    navigator.clipboard.writeText(promptText).then(() => {
+      triggerAlert("AI Prompt Copied!", "Paste it into your chosen AI platform (ChatGPT, Claude, Gemini, etc.) to get an instant analysis!", "success");
+    }).catch(() => {
+      triggerAlert("Error", "Could not copy AI analysis prompt.", "warn");
+    });
+  };
+
   const activeElement = elementsDefinition[activeElementId];
   const activeCampaigns = campaignsData[activeElementId] || [];
 
@@ -709,6 +739,16 @@ export default function BainElementsTool({ onCalculateRun }: BainElementsToolPro
             title="Wipe Matrix Clean"
           >
             <RefreshCw className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={copyAiAnalysisPrompt}
+            className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-white font-extrabold px-4 py-2 rounded-xl transition shadow-md shadow-amber-500/10 cursor-pointer ml-1 animate-pulse"
+            title="Salin prompt analisis AI berbasis data konfigurasi saat ini"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Analyze with AI
           </button>
 
           <button

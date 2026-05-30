@@ -91,6 +91,48 @@ export default function CrmJourneyBuilderTool({ onCalculateRun }: CrmJourneyBuil
     { id: 'edge-5-6', source: 'node-5', target: 'node-6' }
   ]);
 
+  const [copied, setCopied] = useState(false);
+
+  const copyAiAnalysisPrompt = () => {
+    let flowDetails = "";
+    if (nodes.length === 0) {
+      flowDetails = "The CRM Automation flow is currently empty.";
+    } else {
+      flowDetails += "### Nodes in the flow:\n";
+      nodes.forEach(n => {
+        flowDetails += `- [${n.id}] **${n.type.toUpperCase()}**: "${n.label}"\n`;
+      });
+      
+      flowDetails += "\n### Connections in the flow:\n";
+      if (edges.length === 0) {
+        flowDetails += "- No connections defined yet.\n";
+      } else {
+        edges.forEach(e => {
+          const sourceNode = nodes.find(n => n.id === e.source);
+          const targetNode = nodes.find(n => n.id === e.target);
+          if (sourceNode && targetNode) {
+            flowDetails += `- "${sourceNode.label}" (${sourceNode.type.toUpperCase()}) connects to -> "${targetNode.label}" (${targetNode.type.toUpperCase()})\n`;
+          }
+        });
+      }
+    }
+
+    const promptText = `I have designed a CRM Customer Retention Journey or Automation Flow in my CRM sandbox. Here is the configuration I designed:
+
+${flowDetails}
+
+Please act as a senior CRM Automation Architect and Growth Marketing expert. Analyze my journey design and:
+1. Identify any potential structural bottlenecks, design gaps (e.g., missing loops, infinite delays), or missed opportunities in this customer journey.
+2. Outline a detailed execution specification for the Action nodes (e.g., recommended copy templates, dynamic data tokens to use, and delivery best practices).
+3. Suggest 2 advanced condition filters or branch ideas we should add to this sequence to better segment high-value vs low-value customers.
+4. Recommend downstream metrics (e.g., open rates, CTR, conversion windows) we must track to validate the success of this flow.`;
+
+    navigator.clipboard.writeText(promptText).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    });
+  };
+
   // History State for Undoing
   const [pastStates, setPastStates] = useState<{ nodes: CRMNode[]; edges: CRMEdge[] }[]>([]);
   const [interactionInitialState, setInteractionInitialState] = useState<{ nodes: CRMNode[]; edges: CRMEdge[] } | null>(null);
@@ -533,6 +575,20 @@ export default function CrmJourneyBuilderTool({ onCalculateRun }: CrmJourneyBuil
                   <ZoomIn className="h-3.5 w-3.5" />
                 </button>
               </div>
+
+              <button
+                type="button"
+                onClick={copyAiAnalysisPrompt}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  copied 
+                    ? 'bg-emerald-600 text-white border-emerald-500 animate-none' 
+                    : 'bg-amber-500 hover:bg-amber-400 text-white shadow-xs hover:shadow-md animate-pulse'
+                }`}
+                title="Salin prompt analisis AI berdasarkan diagram alur CRM saat ini"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>{copied ? 'Prompt Copied!' : 'Analyze with AI'}</span>
+              </button>
 
               <button
                 type="button"
