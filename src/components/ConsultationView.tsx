@@ -20,6 +20,8 @@ import {
   FileText,
   Video
 } from 'lucide-react';
+import { collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { db, isFirebaseActive, handleFirestoreError, OperationType } from '../lib/firebase';
 
 interface ConsultationSlot {
   id: string;
@@ -39,49 +41,7 @@ interface ConsultationSlot {
   };
 }
 
-const DEFAULT_SLOTS: ConsultationSlot[] = [
-  {
-    id: 'slot-1',
-    date: '2026-05-27',
-    startTime: '10:00',
-    endTime: '10:30',
-    location: 'Official Workshop Meet Room 1',
-    isBooked: false
-  },
-  {
-    id: 'slot-2',
-    date: '2026-05-27',
-    startTime: '14:00',
-    endTime: '14:30',
-    location: 'Consulting Lounge Area - Malang City Mall Hotel',
-    isBooked: false
-  },
-  {
-    id: 'slot-3',
-    date: '2026-05-28',
-    startTime: '11:00',
-    endTime: '11:45',
-    location: 'Official Workshop Meet Room 2',
-    isBooked: true,
-    bookedBy: {
-      name: 'Rian Kusuma',
-      email: 'rian@retailindo.com',
-      topic: 'Optimalisasi RFM database minimarket retail dengan 50k SKU',
-      contact: '+62 812-4545-9988',
-      status: 'approved',
-      meetingLink: 'https://meet.google.com/crm-mstr-rian',
-      speakerNotes: 'Siapkan slide analisa segmentasi cohort yang bersangkutan.'
-    }
-  },
-  {
-    id: 'slot-4',
-    date: '2026-05-29',
-    startTime: '15:30',
-    endTime: '16:00',
-    location: 'Remote Video Teleconference',
-    isBooked: false
-  }
-];
+const DEFAULT_SLOTS: ConsultationSlot[] = [];
 
 export default function ConsultationView() {
   const [slots, setSlots] = useState<ConsultationSlot[]>([]);
@@ -111,23 +71,60 @@ export default function ConsultationView() {
   const [actionNotes, setActionNotes] = useState('');
   const [actionMeetingLink, setActionMeetingLink] = useState('https://meet.google.com/crm-mstr-one');
 
-  // Load from localStorage or default
+  // Load from database/localStorage or default
   useEffect(() => {
-    const savedSlots = localStorage.getItem('crm_consultation_slots');
-    if (savedSlots) {
-      try {
-        setSlots(JSON.parse(savedSlots));
-      } catch (e) {
-        setSlots(DEFAULT_SLOTS);
-      }
-    } else {
-      setSlots(DEFAULT_SLOTS);
-      localStorage.setItem('crm_consultation_slots', JSON.stringify(DEFAULT_SLOTS));
-    }
+    if (isFirebaseActive) {
+      console.log('Firebase Firestore is active. Synchronizing slots in real-time...');
+      const unsub = onSnapshot(collection(db, 'consultation_slots'), (snapshot) => {
+        const list: ConsultationSlot[] = [];
+        snapshot.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() } as ConsultationSlot);
+        });
 
-    const savedSpeakerAuth = localStorage.getItem('crm_speaker_authorized');
-    if (savedSpeakerAuth === 'true') {
-      setIsSpeakerMode(true);
+        // Sort chronologically
+        list.sort((a, b) => {
+          return (`${a.date}T${a.startTime}`).localeCompare(`${b.date}T${b.startTime}`);
+        });
+
+        if (list.length === 0) {
+          // Seeds default slots on first clean Firestore initialization
+          DEFAULT_SLOTS.forEach(async (slot) => {
+            try {
+              await setDoc(doc(db, 'consultation_slots', slot.id), slot);
+            } catch (err) {
+              handleFirestoreError(err, OperationType.CREATE, `consultation_slots/${slot.id}`);
+            }
+          });
+        } else {
+          setSlots(list);
+        }
+      }, (error) => {
+        handleFirestoreError(error, OperationType.LIST, 'consultation_slots');
+      });
+
+      const savedSpeakerAuth = localStorage.getItem('crm_speaker_authorized');
+      if (savedSpeakerAuth === 'true') {
+        setIsSpeakerMode(true);
+      }
+      return () => unsub();
+    } else {
+      console.log('Running in Local Fallback mode using client-side localStorage.');
+      const savedSlots = localStorage.getItem('crm_consultation_slots');
+      if (savedSlots) {
+        try {
+          setSlots(JSON.parse(savedSlots));
+        } catch (e) {
+          setSlots(DEFAULT_SLOTS);
+        }
+      } else {
+        setSlots(DEFAULT_SLOTS);
+        localStorage.setItem('crm_consultation_slots', JSON.stringify(DEFAULT_SLOTS));
+      }
+
+      const savedSpeakerAuth = localStorage.getItem('crm_speaker_authorized');
+      if (savedSpeakerAuth === 'true') {
+        setIsSpeakerMode(true);
+      }
     }
   }, []);
 
@@ -136,14 +133,24 @@ export default function ConsultationView() {
     localStorage.setItem('crm_consultation_slots', JSON.stringify(newSlots));
   };
 
-  const handleSpeakerAuthSubmit = (e: React.FormEvent) => {
+  const handleSpeakerAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passcode.trim() === 'alpharon') {
-      setIsSpeakerMode(true);
-      setPasscodeError('');
-      localStorage.setItem('crm_speaker_authorized', 'true');
-    } else {
-      setPasscodeError('Password speaker salah. Silakan coba lagi!');
+    try {
+      // Secure hash comparison to avoid plain-text passcode in client bundle
+      const msgBuffer = new TextEncoder().encode(passcode.trim());
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashed = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      if (hashed === '9e78698c4c75649fcfdd7d85b9276bd3b2e8300e472cf24cb3a0ad354f145c05') {
+        setIsSpeakerMode(true);
+        setPasscodeError('');
+        localStorage.setItem('crm_speaker_authorized', 'true');
+      } else {
+        setPasscodeError('Password speaker salah. Silakan coba lagi!');
+      }
+    } catch (err) {
+      setPasscodeError('Proses verifikasi kriptografis gagal.');
     }
   };
 
@@ -154,7 +161,7 @@ export default function ConsultationView() {
   };
 
   // Add new available slot (Speaker Action)
-  const handleAddSlot = (e: React.FormEvent) => {
+  const handleAddSlot = async (e: React.FormEvent) => {
     e.preventDefault();
     const created: ConsultationSlot = {
       id: 'slot-' + Date.now(),
@@ -164,11 +171,20 @@ export default function ConsultationView() {
       location: newSlot.location,
       isBooked: false
     };
-    const updated = [...slots, created].sort((a, b) => {
-      // Sort chronologically
-      return (`${a.date}T${a.startTime}`).localeCompare(`${b.date}T${b.startTime}`);
-    });
-    saveToLocalStorage(updated);
+
+    if (isFirebaseActive) {
+      try {
+        await setDoc(doc(db, 'consultation_slots', created.id), created);
+      } catch (err) {
+        handleFirestoreError(err, OperationType.CREATE, `consultation_slots/${created.id}`);
+      }
+    } else {
+      const updated = [...slots, created].sort((a, b) => {
+        // Sort chronologically
+        return (`${a.date}T${a.startTime}`).localeCompare(`${b.date}T${b.startTime}`);
+      });
+      saveToLocalStorage(updated);
+    }
     
     // Reset inputs
     setNewSlot({
@@ -180,11 +196,20 @@ export default function ConsultationView() {
   };
 
   // Delete slot entirely (Speaker Action)
-  const handleDeleteSlot = (id: string) => {
+  const handleDeleteSlot = async (id: string) => {
     const confirmed = window.confirm('Apakah Anda yakin ingin menghapus slot atau data janji temu ini?');
     if (!confirmed) return;
-    const updated = slots.filter(s => s.id !== id);
-    saveToLocalStorage(updated);
+
+    if (isFirebaseActive) {
+      try {
+        await deleteDoc(doc(db, 'consultation_slots', id));
+      } catch (err) {
+        handleFirestoreError(err, OperationType.DELETE, `consultation_slots/${id}`);
+      }
+    } else {
+      const updated = slots.filter(s => s.id !== id);
+      saveToLocalStorage(updated);
+    }
   };
 
   // Open User Booking Modal
@@ -193,31 +218,45 @@ export default function ConsultationView() {
   };
 
   // Submit User Booking Form
-  const handleSubmitBooking = (e: React.FormEvent) => {
+  const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeSlotForBooking) return;
 
-    const updated = slots.map(s => {
-      if (s.id === activeSlotForBooking.id) {
-        return {
-          ...s,
-          isBooked: true,
-          bookedBy: {
-            name: formData.name,
-            email: formData.email,
-            topic: formData.topic,
-            contact: formData.contact,
-            status: 'pending' as const,
-            meetingLink: 'https://meet.google.com/crm-mstr-' + Math.random().toString(36).substring(2, 8)
-          }
-        };
-      }
-      return s;
-    });
+    const bookingDetails = {
+      name: formData.name,
+      email: formData.email,
+      topic: formData.topic,
+      contact: formData.contact,
+      status: 'pending' as const,
+      meetingLink: 'https://meet.google.com/crm-mstr-' + Math.random().toString(36).substring(2, 8)
+    };
 
-    saveToLocalStorage(updated);
+    if (isFirebaseActive) {
+      try {
+        await setDoc(doc(db, 'consultation_slots', activeSlotForBooking.id), {
+          ...activeSlotForBooking,
+          isBooked: true,
+          bookedBy: bookingDetails
+        });
+      } catch (err) {
+        handleFirestoreError(err, OperationType.UPDATE, `consultation_slots/${activeSlotForBooking.id}`);
+      }
+    } else {
+      const updated = slots.map(s => {
+        if (s.id === activeSlotForBooking.id) {
+          return {
+            ...s,
+            isBooked: true,
+            bookedBy: bookingDetails
+          };
+        }
+        return s;
+      });
+      saveToLocalStorage(updated);
+    }
+
     setActiveSlotForBooking(null);
-    alert('Booking berhasil dikirimkan! Menunggu konon/persetujuan dari pembicara.');
+    alert('Booking berhasil dikirimkan! Menunggu konfirmasi/persetujuan dari pembicara.');
   };
 
   // Open Approval Modal for Speaker
@@ -228,61 +267,103 @@ export default function ConsultationView() {
   };
 
   // Speaker approves booking
-  const handleApproveBooking = () => {
-    if (!activeRequestForAction) return;
-    const updated = slots.map(s => {
-      if (s.id === activeRequestForAction.id && s.bookedBy) {
-        return {
-          ...s,
-          bookedBy: {
-            ...s.bookedBy,
-            status: 'approved' as const,
-            meetingLink: actionMeetingLink,
-            speakerNotes: actionNotes
-          }
-        };
+  const handleApproveBooking = async () => {
+    if (!activeRequestForAction || !activeRequestForAction.bookedBy) return;
+
+    const updatedBookedBy = {
+      ...activeRequestForAction.bookedBy,
+      status: 'approved' as const,
+      meetingLink: actionMeetingLink,
+      speakerNotes: actionNotes
+    };
+
+    if (isFirebaseActive) {
+      try {
+        await setDoc(doc(db, 'consultation_slots', activeRequestForAction.id), {
+          ...activeRequestForAction,
+          bookedBy: updatedBookedBy
+        });
+      } catch (err) {
+        handleFirestoreError(err, OperationType.UPDATE, `consultation_slots/${activeRequestForAction.id}`);
       }
-      return s;
-    });
-    saveToLocalStorage(updated);
+    } else {
+      const updated = slots.map(s => {
+        if (s.id === activeRequestForAction.id && s.bookedBy) {
+          return {
+            ...s,
+            bookedBy: updatedBookedBy
+          };
+        }
+        return s;
+      });
+      saveToLocalStorage(updated);
+    }
     setActiveRequestForAction(null);
   };
 
   // Speaker rejects booking
-  const handleRejectBooking = () => {
-    if (!activeRequestForAction) return;
-    const updated = slots.map(s => {
-      if (s.id === activeRequestForAction.id && s.bookedBy) {
-        return {
-          ...s,
-          bookedBy: {
-            ...s.bookedBy,
-            status: 'rejected' as const,
-            speakerNotes: actionNotes
-          }
-        };
+  const handleRejectBooking = async () => {
+    if (!activeRequestForAction || !activeRequestForAction.bookedBy) return;
+
+    const updatedBookedBy = {
+      ...activeRequestForAction.bookedBy,
+      status: 'rejected' as const,
+      speakerNotes: actionNotes
+    };
+
+    if (isFirebaseActive) {
+      try {
+        await setDoc(doc(db, 'consultation_slots', activeRequestForAction.id), {
+          ...activeRequestForAction,
+          bookedBy: updatedBookedBy
+        });
+      } catch (err) {
+        handleFirestoreError(err, OperationType.UPDATE, `consultation_slots/${activeRequestForAction.id}`);
       }
-      return s;
-    });
-    saveToLocalStorage(updated);
+    } else {
+      const updated = slots.map(s => {
+        if (s.id === activeRequestForAction.id && s.bookedBy) {
+          return {
+            ...s,
+            bookedBy: updatedBookedBy
+          };
+        }
+        return s;
+      });
+      saveToLocalStorage(updated);
+    }
     setActiveRequestForAction(null);
   };
 
   // Speaker resets a booked slot back to Available
-  const handleResetSlotToAvailable = (slotId: string) => {
+  const handleResetSlotToAvailable = async (slotId: string) => {
     const confirmed = window.confirm('Kembalikan slot ini menjadi Tersedia & batalkan pendaftaran pengguna?');
     if (!confirmed) return;
-    const updated = slots.map(s => {
-      if (s.id === slotId) {
-        return {
-          ...s,
+
+    if (isFirebaseActive) {
+      try {
+        await setDoc(doc(db, 'consultation_slots', slotId), {
+          id: slotId,
+          ...slots.find(s => s.id === slotId)!,
           isBooked: false,
           bookedBy: undefined
-        };
+        });
+      } catch (err) {
+        handleFirestoreError(err, OperationType.UPDATE, `consultation_slots/${slotId}`);
       }
-      return s;
-    });
-    saveToLocalStorage(updated);
+    } else {
+      const updated = slots.map(s => {
+        if (s.id === slotId) {
+          return {
+            ...s,
+            isBooked: false,
+            bookedBy: undefined
+          };
+        }
+        return s;
+      });
+      saveToLocalStorage(updated);
+    }
   };
 
   return (
@@ -312,7 +393,7 @@ export default function ConsultationView() {
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono text-slate-450 uppercase tracking-wider">STATUS AKSES</span>
             {isSpeakerMode ? (
-              <span className="px-2 py-0.5 bg-rose-500/10 text-rose-300 border border-rose-500/20 text-[9px] font-bold rounded-full font-mono">
+              <span className="px-2 py-0.5 bg-rose-50/10 text-rose-300 border border-rose-500/20 text-[9px] font-bold rounded-full font-mono">
                 SPEAKER ACTIVE
               </span>
             ) : (
@@ -375,7 +456,7 @@ export default function ConsultationView() {
             
             <div className="flex gap-2 shrink-0">
               <span className="text-[10.5px] font-mono text-rose-700 bg-rose-50 border border-rose-150 px-2.5 py-1 rounded-lg font-bold">
-                Passcode Matched: "alpharon"
+                Authorized Speaker Profile Active
               </span>
             </div>
           </div>

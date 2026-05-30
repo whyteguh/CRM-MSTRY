@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny gate
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Configuration rules for consultation clinic
+    match /consultation_slots/{slotId} {
+      // Allow read to anyone so schedules can be browsed
+      allow read: if true;
+      
+      // Allow write operations for the app's workflow (creation, updates, and cancellations)
+      allow write: if true;
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "ConsultationSlot": {
+      "title": "ConsultationSlot",
+      "description": "A booking slot or approved consultation meeting for premium CRM strategic alignment clinic.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the slot."
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of the consultation in YYYY-MM-DD format."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "HH:MM format for slot begin time."
+        },
+        "endTime": {
+          "type": "string",
+          "description": "HH:MM format for slot end time."
+        },
+        "location": {
+          "type": "string",
+          "description": "Physical, virtual room, or meet link where the session is hosted."
+        },
+        "isBooked": {
+          "type": "boolean",
+          "description": "Whether the slot is currently request-booked or locked."
+        },
+        "bookedBy": {
+          "type": "object",
+          "description": "Information about the user who booked this slot.",
+          "properties": {
+            "name": { "type": "string" },
+            "email": { "type": "string" },
+            "topic": { "type": "string" },
+            "contact": { "type": "string" },
+            "status": {
+              "type": "string",
+              "enum": ["pending", "approved", "rejected"]
+            },
+            "meetingLink": { "type": "string" },
+            "speakerNotes": { "type": "string" }
+          },
+          "required": ["name", "email", "topic", "contact", "status"]
+        }
+      },
+      "required": ["id", "date", "startTime", "endTime", "location", "isBooked"]
+    }
+  },
+  "firestore": {
+    "/consultation_slots/{slotId}": {
+      "schema": "ConsultationSlot",
+      "description": "Contains metadata for available, pending, and scheduled consult appointments."
+    }
+  }
+}
